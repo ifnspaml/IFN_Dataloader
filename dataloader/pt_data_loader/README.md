@@ -3,10 +3,6 @@ versions of Python at the moment.
 
 Datasets
 ========
-BEFORE using the dataloader be aware that you change the PYTHONPATH to point 
-on the computer vision repository as for example:
-
-export PYTHONPATH=$PYTHONPATH:"/home/klingner/Desktop/Code/computer_vision"
 
 To create a Dataset, use one of the classes in `specialdatasets.py`.
 There are classes for KITTI datasets and Cityscape datasets, both of
