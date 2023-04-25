@@ -13,6 +13,7 @@ import random
 import time
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as transforms_fun
+from torchvision.transforms.functional import InterpolationMode
 
 IMAGENAMES = ['color', 'segmentation', 'depth', 'flow']
 NUMERICNAMES = ['camera_intrinsics', 'poses', 'velocity', 'timestamp']
@@ -580,10 +581,10 @@ class RandomRotate(MultipleImageTransform):
             if any(item in name for item in IMAGENAMES) and is_rotate:
                 if 'color' in name or ('depth' in name and 'processed' in name):
                     sample[key] = transforms_fun.affine(sample[key], angle=run_rotation, translate=(0, 0),
-                                                        scale=1.0, shear=0, resample=pil.BILINEAR)
+                                                        scale=1.0, shear=0, resample=InterpolationMode.BILINEAR)
                 elif any(keyword in name for keyword in resample_nearest_list):
                     sample[key] = transforms_fun.affine(sample[key], angle=run_rotation, translate=(0, 0),
-                                                        scale=1.0, shear=0, resample=pil.NEAREST)
+                                                        scale=1.0, shear=0, resample=InterpolationMode.NEAREST)
         if is_rotate:
             sample = cropper(sample)
         return sample
@@ -704,8 +705,8 @@ class RandomRescale(MultipleImageTransform):
             run_scale = self.scale[tuple_pos]
         native_im_shape = sample[('color', 0, 0)].size
         output_size = (int(native_im_shape[1] // run_scale), int(native_im_shape[0] // run_scale))
-        resize_interp = transforms.Resize(output_size, interpolation=pil.BILINEAR)
-        resize_nearest = transforms.Resize(output_size, interpolation=pil.NEAREST)
+        resize_interp = transforms.Resize(output_size, interpolation=InterpolationMode.BILINEAR)
+        resize_nearest = transforms.Resize(output_size, interpolation=InterpolationMode.NEAREST)
         for key in sample.keys():
             if isinstance(key, tuple) and key[-1] == 0:
                 name = key[0]
@@ -775,8 +776,8 @@ class Resize(MultipleImageTransform):
             scale_1 = self.output_size[1] / native_im_shape[0]
             output_size = self.get_new_dim(native_im_shape, max(scale_0, scale_1))
 
-        resize_interp = transforms.Resize(output_size, interpolation=pil.BILINEAR)
-        resize_nearest = transforms.Resize(output_size, interpolation=pil.NEAREST)
+        resize_interp = transforms.Resize(output_size, interpolation=InterpolationMode.BILINEAR)
+        resize_nearest = transforms.Resize(output_size, interpolation=InterpolationMode.NEAREST)
 
         for key in list(sample.keys()):
             if isinstance(key, tuple) and key[-1] == 0:
@@ -847,10 +848,10 @@ class MultiResize(MultipleImageTransform):
                 scale_factor = 2 ** scale
                 if 'color' in name or ('depth' in name and 'processed' in name):
                     new_image = transforms_fun.resize(sample[key], native_im_shape//scale_factor,
-                                                      interpolation=pil.BILINEAR)
+                                                      interpolation=InterpolationMode.BILINEAR)
                 elif any(keyword in name for keyword in resize_nearest_list):
                     new_image = transforms_fun.resize(sample[key], native_im_shape//scale_factor,
-                                                      interpolation=pil.NEAREST)
+                                                      interpolation=InterpolationMode.NEAREST)
                 elif 'camera_intrinsics' in name or 'K' in name:
                     K = sample[key].copy()
                     K[0, :] = K[0, :] / scale_factor
